@@ -1,8 +1,13 @@
 package com.amp.tapcode;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,10 +23,12 @@ public class MainActivity extends AppCompatActivity {
     double sinValue = Math.sin(radians);
     double cosValue = Math.cos(radians);
     String password = "";
+    Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         setContentView(R.layout.activity_main);
         findViewById(R.id.touchView).setOnTouchListener(handleTouch);
     }
@@ -64,18 +71,27 @@ public class MainActivity extends AppCompatActivity {
         flag = 1;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private int getTapLocation(int x, int y) {
 
         int transformedX = (int)(x * cosValue - y * sinValue) - initialX;
         int transformedY = (int)(x * sinValue + y * cosValue) - initialY;
 
         if(transformedX >= 0 && transformedY >= 0) {
+            VibrationEffect effect = VibrationEffect.createOneShot(40, 100);
+            vibrator.vibrate(effect);
             return 2;
         } else if(transformedX >= 0) {
+            VibrationEffect effect = VibrationEffect.createOneShot(20, 100);
+            vibrator.vibrate(effect);
             return 1;
         } else if(transformedY < 0) {
+            VibrationEffect effect = VibrationEffect.createOneShot(80, 100);
+            vibrator.vibrate(effect);
             return 4;
         } else {
+            VibrationEffect effect = VibrationEffect.createOneShot(60, 100);
+            vibrator.vibrate(effect);
             return 3;
         }
     }
